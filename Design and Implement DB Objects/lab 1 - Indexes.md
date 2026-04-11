@@ -30,6 +30,7 @@ CREATE TABLE ESG.EmissionRecords_Large (
     Source NVARCHAR(50),
 
     CONSTRAINT PK_Emission_Large PRIMARY KEY NONCLUSTERED (RecordID)
+    FOREIGN KEY (CompanyID) REFERENCES ESG.Companies(CompanyID)
 );
 ```
 
@@ -104,3 +105,10 @@ SET SHOWPLAN_ALL ON;
 ```
 
 now run query again to see how indexes are used in the execution plan.
+
+#### Drop the Table
+
+```sql
+DROP TABLE IF EXISTS ESG.EmissionRecords_Large
+```
+
