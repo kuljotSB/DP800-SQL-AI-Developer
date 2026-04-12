@@ -18,7 +18,7 @@ Your task is to implement these specialized table types and understand their use
 Track Historical changes:
 ```sql
 CREATE TABLE ESG.CompanyTargets (
-    TargetID INT PRIMARY KEY IDENTITY,
+    TargetID INT PRIMARY KEY IDENTITY(1,1),
     CompanyID INT,
     TargetEmission DECIMAL(10,2),
 
