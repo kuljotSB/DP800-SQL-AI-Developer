@@ -22,14 +22,13 @@ Your task is to:
 Create ESG.EmissionRecords_Large Table:
 ```sql
 CREATE TABLE ESG.EmissionRecords_Large (
-    RecordID INT IDENTITY(1,1),
+    RecordID INT IDENTITY(1,1) PRIMARY KEY,
     CompanyID INT NOT NULL,
     EmissionDate DATE NOT NULL,
     Scope TINYINT NOT NULL,
     CO2_Emissions DECIMAL(10,2) NOT NULL,
     Source NVARCHAR(50),
 
-    CONSTRAINT PK_Emission_Large PRIMARY KEY NONCLUSTERED (RecordID)
     FOREIGN KEY (CompanyID) REFERENCES ESG.Companies(CompanyID)
 );
 ```
@@ -40,7 +39,7 @@ SET NOCOUNT ON;
 
 DECLARE @i INT = 1;
 
-WHILE @i <= 1000
+WHILE @i <= 20000
 BEGIN
     INSERT INTO ESG.EmissionRecords_Large (CompanyID, EmissionDate, Scope, CO2_Emissions, Source)
     VALUES (
@@ -52,35 +51,18 @@ BEGIN
     );
 
     SET @i = @i + 1;
+
+    If (@i % 10000 = 0)
+        PRINT CONCAT(@i, ' rows inserted');
 END;
 ```
 
-#### Run Query without Index (Baseline)
+#### Run a Query with the Primary Clustered Index
 
-```sql
-SET STATISTICS TIME ON;
-SET STATISTICS IO ON;
-
-SELECT *
-FROM ESG.EmissionRecords_Large
-WHERE CompanyID = 3
-ORDER BY EmissionDate;
-```
-
-#### Create Clustered Index
-
-Cluster on EmissionDate for faster sorting
-```sql
-CREATE CLUSTERED INDEX IX_EmissionDate
-ON ESG.EmissionRecords_Large (EmissionDate);
-```
-
-Re-run query (optimized for sorting)
 ```sql
 SELECT *
 FROM ESG.EmissionRecords_Large
-WHERE CompanyID = 3
-ORDER BY EmissionDate;
+WHERE RecordID = 500;
 ```
 
 #### Create Non-Clustered Index
@@ -97,6 +79,14 @@ SELECT CompanyID
 FROM ESG.EmissionRecords_Large
 WHERE CompanyID = 3;
 ```
+
+Hint to force index usage
+```sql
+SELECT *
+FROM ESG.EmissionRecords_Large WITH (INDEX(IX_CompanyID))
+WHERE CompanyID = 3;
+```
+
 
 #### View Execution Plan
 
