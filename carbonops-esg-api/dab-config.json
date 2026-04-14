@@ -39,14 +39,6 @@
         "object": "ESG.Companies",
         "type": "table"
       },
-      "relationships": {
-        "emissions": {
-          "cardinality": "many",
-          "target.entity": "EmissionRecord",
-          "source.fields": ["CompanyID"],
-          "target.fields": ["CompanyID"]
-        }
-      },
       "graphql": {
         "enabled": true,
         "type": {
@@ -66,20 +58,24 @@
             }
           ]
         }
-      ]
+      ],
+      "relationships": {
+        "emissions": {
+          "cardinality": "many",
+          "target.entity": "EmissionRecord",
+          "source.fields": [
+            "CompanyID"
+          ],
+          "target.fields": [
+            "CompanyID"
+          ]
+        }
+      }
     },
     "EmissionRecord": {
       "source": {
         "object": "ESG.EmissionRecords",
         "type": "table"
-      },
-      "relationships": {
-        "company": {
-          "cardinality": "one",
-          "target.entity": "Company",
-          "source.fields": ["CompanyID"],
-          "target.fields": ["CompanyID"]
-        }
       },
       "graphql": {
         "enabled": true,
@@ -100,7 +96,19 @@
             }
           ]
         }
-      ]
+      ],
+      "relationships": {
+        "company": {
+          "cardinality": "one",
+          "target.entity": "Company",
+          "source.fields": [
+            "CompanyID"
+          ],
+          "target.fields": [
+            "CompanyID"
+          ]
+        }
+      }
     },
     "EnergyConsumption": {
       "source": {
@@ -149,6 +157,124 @@
           "actions": [
             {
               "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "CompanyEmissions": {
+      "source": {
+        "object": "ESG.vw_CompanyEmissions",
+        "type": "view",
+        "key-fields": [
+          "CompanyID"
+        ]
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "CompanyEmissions",
+          "plural": "CompanyEmissions"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "EnergyEfficiency": {
+      "source": {
+        "object": "ESG.vw_EnergyEfficiency",
+        "type": "view",
+        "key-fields": [
+          "CompanyID"
+        ]
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "EnergyEfficiency",
+          "plural": "EnergyEfficiencies"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "AddEmission": {
+      "source": {
+        "object": "ESG.sp_AddEmission",
+        "type": "stored-procedure"
+      },
+      "graphql": {
+        "enabled": true,
+        "operation": "mutation",
+        "type": {
+          "singular": "AddEmission",
+          "plural": "AddEmissions"
+        }
+      },
+      "rest": {
+        "enabled": true,
+        "methods": [
+          "post"
+        ]
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "execute"
+            }
+          ]
+        }
+      ]
+    },
+    "HighEmitters": {
+      "source": {
+        "object": "ESG.sp_GetHighEmitters",
+        "type": "stored-procedure"
+      },
+      "graphql": {
+        "enabled": true,
+        "operation": "mutation",
+        "type": {
+          "singular": "HighEmitters",
+          "plural": "HighEmitters"
+        }
+      },
+      "rest": {
+        "enabled": true,
+        "methods": [
+          "post"
+        ]
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "execute"
             }
           ]
         }
