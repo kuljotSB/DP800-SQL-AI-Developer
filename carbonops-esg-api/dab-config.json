@@ -1,0 +1,158 @@
+{
+  "$schema": "https://github.com/Azure/data-api-builder/releases/download/v1.7.92/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('DATABASE_CONNECTION_STRING')",
+    "options": {
+      "set-session-context": false
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api",
+      "request-body-strict": true
+    },
+    "graphql": {
+      "enabled": true,
+      "path": "/graphql",
+      "allow-introspection": true
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp"
+    },
+    "host": {
+      "cors": {
+        "origins": [],
+        "allow-credentials": false
+      },
+      "authentication": {
+        "provider": "AppService"
+      },
+      "mode": "development"
+    }
+  },
+  "entities": {
+    "Company": {
+      "source": {
+        "object": "ESG.Companies",
+        "type": "table"
+      },
+      "relationships": {
+        "emissions": {
+          "cardinality": "many",
+          "target.entity": "EmissionRecord",
+          "source.fields": ["CompanyID"],
+          "target.fields": ["CompanyID"]
+        }
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "Company",
+          "plural": "Companies"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "EmissionRecord": {
+      "source": {
+        "object": "ESG.EmissionRecords",
+        "type": "table"
+      },
+      "relationships": {
+        "company": {
+          "cardinality": "one",
+          "target.entity": "Company",
+          "source.fields": ["CompanyID"],
+          "target.fields": ["CompanyID"]
+        }
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "EmissionRecord",
+          "plural": "EmissionRecords"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "EnergyConsumption": {
+      "source": {
+        "object": "ESG.EnergyConsumption",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "EnergyConsumption",
+          "plural": "EnergyConsumptions"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    },
+    "SustainabilityReport": {
+      "source": {
+        "object": "ESG.SustainabilityReports",
+        "type": "table"
+      },
+      "graphql": {
+        "enabled": true,
+        "type": {
+          "singular": "SustainabilityReport",
+          "plural": "SustainabilityReports"
+        }
+      },
+      "rest": {
+        "enabled": true
+      },
+      "permissions": [
+        {
+          "role": "anonymous",
+          "actions": [
+            {
+              "action": "read"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
