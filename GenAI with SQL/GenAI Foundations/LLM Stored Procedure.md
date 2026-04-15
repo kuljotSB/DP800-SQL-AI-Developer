@@ -4,7 +4,7 @@
 
 ```sql
 CREATE OR ALTER PROCEDURE RAG.sp_AskLLM
-    @question NVARCHAR(MAX)
+    @question NVARCHAR(MAX),
     @systemPrompt NVARCHAR(MAX) = N'You are a helpful assistant that answers user queries'
 AS
 BEGIN
@@ -26,15 +26,17 @@ BEGIN
           "content": "' + REPLACE(@question, '"', '\"') + N'"
         }
       ],
-      "max_tokens": 100
+      "model": "<model-name>",
+      "max_completion_tokens": 2000,
+      "temperature": 0.7
     }';
 
     -- Step 2: Call LLM
     EXEC @returnValue = sp_invoke_external_rest_endpoint
-        @url = N'https://<endpoint>.openai.azure.com/openai/deployments/<chat-model>/chat/completions?api-version=2024-02-15-preview',
+        @url = N'https://<resource-name>.openai.azure.com/openai/v1/chat/completions',
         @method = 'POST',
         @payload = @payload,
-        @credential = [https://<endpoint>.cognitiveservices.azure.com/],
+        @credential = [https://<resource-name>.openai.azure.com/],
         @response = @response OUTPUT;
 
     -- Step 3: Return result
@@ -58,13 +60,13 @@ END;
 
 ```sql
 EXEC RAG.sp_AskLLM 
-    @question = N'What is the capital of France?',
+    @question = N'What is the capital of France? Tell me more about it',
     @systemPrompt = N'You are a geography expert.';
 ```
 
 ```sql
 EXEC RAG.sp_AskLLM 
-    @question = N'Help me plan a trip to India',
+    @question = N'Help me plan a trip to India during summers',
     @systemPrompt = N'You are a travel expert';
 ```
 
