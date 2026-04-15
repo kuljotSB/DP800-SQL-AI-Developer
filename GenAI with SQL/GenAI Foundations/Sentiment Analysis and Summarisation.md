@@ -47,27 +47,27 @@ BEGIN
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
-        -- Build payload
         SET @payload = N'{
           "messages": [
             {
               "role": "system",
-              "content": "Classify sentiment as Positive, Negative, or Neutral."
+              "content": "Classify sentiment as Positive, Negative, or Neutral. Reply with one word only."
             },
             {
               "role": "user",
               "content": "' + REPLACE(@review, '"', '\"') + N'"
             }
           ],
-          "max_tokens": 20
+          "model": "<YOUR-MODEL-NAME>",
+          "max_completion_tokens": 20,
+          "temperature": 0.4
         }';
 
-        -- Call LLM
         EXEC @returnValue = sp_invoke_external_rest_endpoint
-            @url = N'https://<endpoint>.openai.azure.com/openai/deployments/<chat-model>/chat/completions?api-version=2024-02-15-preview',
+            @url = N'https://<resource-name>.openai.azure.com/openai/v1/chat/completions',
             @method = 'POST',
             @payload = @payload,
-            @credential = [https://<endpoint>.cognitiveservices.azure.com/],
+            @credential = [https://<resource-name>.openai.azure.com/],
             @response = @response OUTPUT;
 
         IF @returnValue = 0
@@ -93,6 +93,17 @@ END;
 EXEC RAG.sp_AnalyzeSentiment;
 ```
 
+#### View Results
+
+```sql
+SELECT 
+    CompanyName,
+    ReviewText,
+    Sentiment
+FROM RAG.ESG_TextData;
+```
+
+
 #### Create a Stored Procedure for Summarization
 
 ```sql
@@ -100,7 +111,6 @@ CREATE OR ALTER PROCEDURE RAG.sp_SummarizeReports
 AS
 BEGIN
     SET NOCOUNT ON;
-
     DECLARE @id INT, @report NVARCHAR(MAX);
     DECLARE @payload NVARCHAR(MAX);
     DECLARE @response NVARCHAR(MAX);
@@ -112,12 +122,11 @@ BEGIN
     FROM RAG.ESG_TextData;
 
     OPEN report_cursor;
-
     FETCH NEXT FROM report_cursor INTO @id, @report;
 
     WHILE @@FETCH_STATUS = 0
     BEGIN
-        -- Build payload
+        -- STRING_ESCAPE handles quotes, newlines, tabs, backslashes etc.
         SET @payload = N'{
           "messages": [
             {
@@ -126,26 +135,34 @@ BEGIN
             },
             {
               "role": "user",
-              "content": "' + REPLACE(@report, '"', '\"') + N'"
+              "content": "' + STRING_ESCAPE(@report, 'json') + N'"
             }
           ],
-          "max_tokens": 100
+          "model": "<MODEL-NAME>",
+          "max_completion_tokens": 200,
+          "temperature": 0.4
         }';
 
-        -- Call LLM
         EXEC @returnValue = sp_invoke_external_rest_endpoint
-            @url = N'https://<endpoint>.openai.azure.com/openai/deployments/<chat-model>/chat/completions?api-version=2024-02-15-preview',
+            @url = N'https://<resource-name>.openai.azure.com/openai/v1/chat/completions',
             @method = 'POST',
             @payload = @payload,
-            @credential = [https://<endpoint>.cognitiveservices.azure.com/],
+            @credential = [https://<resource-name>.openai.azure.com/],
             @response = @response OUTPUT;
 
         IF @returnValue = 0
         BEGIN
             SET @summary = JSON_VALUE(@response, '$.result.choices[0].message.content');
-
             UPDATE RAG.ESG_TextData
             SET Summary = @summary
+            WHERE RecordID = @id;
+        END
+        ELSE
+        BEGIN
+            -- Log error per row so cursor continues instead of stopping
+            UPDATE RAG.ESG_TextData
+            SET Summary = 'ERROR: ' + CAST(@returnValue AS NVARCHAR(10)) 
+                        + ' - ' + JSON_VALUE(@response, '$.response.status.http.description')
             WHERE RecordID = @id;
         END
 
@@ -168,8 +185,7 @@ EXEC RAG.sp_SummarizeReports;
 ```sql
 SELECT 
     CompanyName,
-    ReviewText,
-    Sentiment,
+    SustainabilityReport,
     Summary
 FROM RAG.ESG_TextData;
 ```
