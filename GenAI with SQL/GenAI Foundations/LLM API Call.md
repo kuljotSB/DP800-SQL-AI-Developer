@@ -2,21 +2,37 @@
 
 #### Create Managed Identity Credentials for LLM API Access
 
+Create a master key for credential/identity encryption purposes:
+```sql
+CREATE MASTER KEY 
+ENCRYPTION BY PASSWORD = 'StrongPassword@123!';
+```
+
+Grant invoke permissions on the stored procedure:
+```sql
+GRANT EXECUTE ANY EXTERNAL ENDPOINT TO [PUBLIC];
+```
+
 Create a database scoped credential to allow SQL to call the LLM API securely using a managed identity. Replace `<resource-name>` with the name of your Azure Cognitive Services resource.
 
 **Note**: Grant the managed identity `Cognitive Services OpenAI User` role access to the Azure Cognitive Services resource in the Azure portal.
 
 ```sql
-CREATE DATABASE SCOPED CREDENTIAL [https://<resource-name>.cognitiveservices.azure.com/]
+CREATE DATABASE SCOPED CREDENTIAL [https://<resource-name>.openai.azure.com/]
     WITH IDENTITY = 'Managed Identity',
     SECRET = '{"resourceid":"https://cognitiveservices.azure.com"}';
 ```
 
 Alternatively, you can even use API Key based authentication, but that is less secure and not recommended for production scenarios.
 ```sql
-CREATE DATABASE SCOPED CREDENTIAL [https://<resource-name>.cognitiveservices.azure.com/]
+CREATE DATABASE SCOPED CREDENTIAL [https://<resource-name>.openai.azure.com/]
     WITH IDENTITY = 'HTTPEndpointHeaders',
     SECRET = '{"api-key":"<your-api-key>"}';
+```
+
+Check that the credential was created successfully:
+```sql
+SELECT * FROM sys.database_scoped_credentials;
 ```
 
 #### Call LLM API from SQL
@@ -24,19 +40,20 @@ CREATE DATABASE SCOPED CREDENTIAL [https://<resource-name>.cognitiveservices.azu
 Create a simple prompt payload:
 ```sql
 DECLARE @payload NVARCHAR(MAX);
-
 SET @payload = N'{
-  "messages": [
-  {
-      "role": "system",
-      "content": "You are Batman - The Dark Knight of Gotham City. Answer questions in a brooding, mysterious manner."
-  },
-  {
-      "role": "user",
-      "content": "How is Gotham city doing today?"
-  }
-  ],
-  "temperature": 0.7,
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are Batman, the Dark Knight of Gotham City. Answer questions in character."
+        },
+        {
+            "role": "user",
+            "content": "How is Gotham City doing today?"
+        }
+    ],
+    "model": "YOUR_MODEL_NAME",
+    "max_completion_tokens": 2000,
+    "temperature": 0.7
 }';
 ```
 
@@ -46,10 +63,10 @@ DECLARE @response NVARCHAR(MAX);
 DECLARE @returnValue INT;
 
 EXEC @returnValue = sp_invoke_external_rest_endpoint
-    @url = N'https://<endpoint>.openai.azure.com/openai/deployments/<chat-model>/chat/completions?api-version=2024-02-15-preview',
+    @url = N'https://<resource-name>.openai.azure.com/openai/v1/chat/completions',
     @method = 'POST',
     @payload = @payload,
-    @credential = [https://<endpoint>.cognitiveservices.azure.com/],
+    @credential = [https://<resource-name>.openai.azure.com/],
     @response = @response OUTPUT;
 ```
 
