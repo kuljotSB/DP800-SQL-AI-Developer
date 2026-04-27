@@ -121,7 +121,7 @@ ON PS_EmissionDate(EmissionDate);
 
 ```sql
 SELECT *
-FROM ESG.EmissionRecords_Partitioned
+FROM ESG.EmissionRecords_Partitioned WITH (INDEX(IX_Emission_Company))
 WHERE CompanyID = 2
 AND EmissionDate BETWEEN '2025-01-01' AND '2025-12-31';
 ```
