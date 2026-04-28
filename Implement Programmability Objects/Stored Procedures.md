@@ -177,7 +177,8 @@ EXEC ESG.InsertEmissionRecord
 CREATE PROCEDURE ESG.SafeInsertEmission
     @CompanyID INT,
     @EmissionDate DATETIME,
-    @CO2_Emissions DECIMAL(10,2)
+    @CO2_Emissions DECIMAL(10,2),
+    @Scope TINYINT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -193,9 +194,9 @@ BEGIN
         END
 
         INSERT INTO ESG.EmissionRecords
-        (CompanyID, EmissionDate, CO2_Emissions)
+        (CompanyID, EmissionDate, CO2_Emissions, Scope)
         VALUES
-        (@CompanyID, @EmissionDate, @CO2_Emissions);
+        (@CompanyID, @EmissionDate, @CO2_Emissions, @Scope);
 
         COMMIT TRANSACTION;
     END TRY
@@ -214,7 +215,8 @@ END;
 EXEC ESG.SafeInsertEmission 
     @CompanyID = 999, -- Non-existent company
     @EmissionDate = '2025-05-01',
-    @CO2_Emissions = 1200;
+    @CO2_Emissions = 1200,
+    @Scope = 2;
 ```
 
 #### Lab Cleanup - Delete Stored Procedures
