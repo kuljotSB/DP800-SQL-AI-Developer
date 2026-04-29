@@ -99,19 +99,3 @@ FROM ESG.CompanyNode c1,
 WHERE MATCH(c1-(s)->c2)
   AND s.ContractValue > 40000;
 ```
-
-#### Shortest Path Query
-
-```sql
-SELECT 
-    StartCompany.CompanyName,
-    LAST_VALUE(TargetCompany.CompanyName) 
-        WITHIN GROUP (GRAPH PATH) AS ReachableCompany,
-    COUNT(TargetCompany.CompanyName) 
-        WITHIN GROUP (GRAPH PATH) AS Distance
-FROM ESG.CompanyNode AS StartCompany,
-     ESG.SuppliesTo FOR PATH AS s,
-     ESG.CompanyNode FOR PATH AS TargetCompany
-WHERE MATCH(SHORTEST_PATH(StartCompany(-(s)->TargetCompany){1,3}))
-  AND StartCompany.CompanyID = 1;
-```
