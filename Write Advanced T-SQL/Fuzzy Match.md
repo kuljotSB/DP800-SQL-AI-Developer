@@ -91,9 +91,9 @@ SELECT
     JARO_WINKLER_DISTANCE(
         CAST('GreenSteel Ltd' AS NVARCHAR(100)),
         CAST(CompanyName AS NVARCHAR(100))
-    ) AS Similarity
+    ) AS Distance
 FROM ESG.Companies
-ORDER BY Similarity DESC;
+ORDER BY Distance DESC;
 ```
 
 
