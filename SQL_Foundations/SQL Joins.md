@@ -107,18 +107,7 @@ INNER JOIN ESG.CarbonTargets t
 ON c.CompanyID = t.CompanyID;
 ```
 
-#### Task 2: INNER JOIN with Aggregation
-
-Total emissions per company
-```sql
-SELECT c.CompanyName, SUM(e.CO2_Emissions) AS TotalEmissions
-FROM ESG.Companies c
-INNER JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID
-GROUP BY c.CompanyName;
-```
-
-#### Task 3: LEFT JOIN (Important for Analytics)
+#### Task 2: LEFT JOIN (Important for Analytics)
 
 ```sql
 SELECT c.CompanyName, t.TargetReductionPercent
@@ -137,7 +126,7 @@ ON c.CompanyID = t.CompanyID;
 WHERE c.CompanyID IS NULL;
 ```
 
-#### Task 5: RIGHT JOIN
+#### Task 4: RIGHT JOIN
 
 ```sql
 SELECT c.CompanyName, t.TargetReductionPercent
@@ -146,7 +135,7 @@ RIGHT JOIN ESG.CarbonTargets t
 ON c.CompanyID = t.CompanyID;
 ```
 
-#### Task 6: FULL OUTER JOIN
+#### Task 5: FULL OUTER JOIN
 
 ```sql
 SELECT c.CompanyName, t.TargetReductionPercent
@@ -155,7 +144,16 @@ FULL OUTER JOIN ESG.CarbonTargets t
 ON c.CompanyID = t.CompanyID;
 ```
 
-#### Task 7: Multi-Table JOIN (Real Business Scenario)
+#### Task 6: Aggregates and Multi-Table JOIN (Real Business Scenario)
+
+Total emissions per company
+```sql
+SELECT c.CompanyName, SUM(e.CO2_Emissions) AS TotalEmissions
+FROM ESG.Companies c
+INNER JOIN ESG.EmissionRecords e
+ON c.CompanyID = e.CompanyID
+GROUP BY c.CompanyName;
+```
 
 Combine companies, emissions and energy data
 ```sql
