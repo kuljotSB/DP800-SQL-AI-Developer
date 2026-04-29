@@ -98,30 +98,3 @@ WHERE e.CO2_Emissions > (
     WHERE e2.CompanyID = e.CompanyID
 );
 ```
-
-#### CTE + Correlated Subquery
-
-Detect High Emissions with CTE:
-```sql
-WITH CompanyAverages AS (
-    SELECT 
-        CompanyID,
-        AVG(CO2_Emissions) AS AvgEmissions
-    FROM ESG.EmissionRecords
-    GROUP BY CompanyID
-)
-SELECT 
-    e.CompanyID,
-    e.CO2_Emissions,
-    e.EmissionDate,
-    e.Source,
-    ca.AvgEmissions
-FROM ESG.EmissionRecords e
-JOIN CompanyAverages ca
-    ON e.CompanyID = ca.CompanyID
-WHERE e.CO2_Emissions > (
-    SELECT AVG(e2.CO2_Emissions) * 1.5
-    FROM ESG.EmissionRecords e2
-    WHERE e2.CompanyID = e.CompanyID
-);
-```
