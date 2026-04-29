@@ -12,6 +12,44 @@ Your ESG platform stores data across multiple tables:
 
 To generate insights for clients, you must combine data across these tables using SQL joins.
 
+#### Create New Table
+
+Create a new table `ESG.CarbonTargets` 
+```sql
+CREATE TABLE ESG.CarbonTargets (
+    TargetID INT PRIMARY KEY IDENTITY(1,1),
+    CompanyID INT,
+    TargetYear INT,
+    TargetReductionPercent DECIMAL(5,2)
+);
+```
+
+Add data into the table:
+```sql
+INSERT INTO ESG.CarbonTargets (CompanyID, TargetYear, TargetReductionPercent)
+VALUES
+-- Valid matches (existing companies)
+(1, 2030, 30.00),
+(1, 2035, 45.00),
+
+(2, 2030, 25.00),
+(2, 2040, 50.00),
+
+(3, 2035, 40.00),
+(3, 2045, 55.00),
+
+(4, 2040, 35.00),
+
+(5, 2030, 20.00),
+(6, 2035, 28.00),
+(7, 2030, 22.00),
+(8, 2040, 18.00),
+
+-- Orphan records (NO matching company)
+(999, 2030, 60.00),
+(1000, 2040, 70.00);
+```
+
 #### Add More Data
 
 Add more companies:
@@ -62,12 +100,11 @@ VALUES
 
 #### Task 1: INNER JOIN (Most Common)
 
-Get company names with emission records
 ```sql
-SELECT c.CompanyName, e.CO2_Emissions, e.Scope
+SELECT c.CompanyName, t.TargetReductionPercent
 FROM ESG.Companies c
-INNER JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID;
+INNER JOIN ESG.CarbonTargets t
+ON c.CompanyID = t.CompanyID;
 ```
 
 #### Task 2: INNER JOIN with Aggregation
@@ -83,43 +120,39 @@ GROUP BY c.CompanyName;
 
 #### Task 3: LEFT JOIN (Important for Analytics)
 
-Get all companies + emissions (including missing)
 ```sql
-SELECT c.CompanyName, e.CO2_Emissions
+SELECT c.CompanyName, t.TargetReductionPercent
 FROM ESG.Companies c
-LEFT JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID;
+LEFT JOIN ESG.CarbonTargets t
+ON c.CompanyID = t.CompanyID;
 ```
 
 #### Task 3: Find Missing Data using LEFT JOIN
 
-Companies with NO emission records
 ```sql
-SELECT c.CompanyName
+SELECT c.CompanyName, t.TargetReductionPercent
 FROM ESG.Companies c
-LEFT JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID
-WHERE e.CompanyID IS NULL;
+LEFT JOIN ESG.CarbonTargets t
+ON c.CompanyID = t.CompanyID;
+WHERE c.CompanyID IS NULL;
 ```
 
 #### Task 5: RIGHT JOIN
 
-Get all emission records with company info
 ```sql
-SELECT c.CompanyName, e.CO2_Emissions
+SELECT c.CompanyName, t.TargetReductionPercent
 FROM ESG.Companies c
-RIGHT JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID;
+RIGHT JOIN ESG.CarbonTargets t
+ON c.CompanyID = t.CompanyID;
 ```
 
 #### Task 6: FULL OUTER JOIN
 
-Combine all companies and emissions, showing all intersecting and non-intersecting records
 ```sql
-SELECT c.CompanyName, e.CO2_Emissions
+SELECT c.CompanyName, t.TargetReductionPercent
 FROM ESG.Companies c
-FULL OUTER JOIN ESG.EmissionRecords e
-ON c.CompanyID = e.CompanyID;
+FULL OUTER JOIN ESG.CarbonTargets t
+ON c.CompanyID = t.CompanyID;
 ```
 
 #### Task 7: Multi-Table JOIN (Real Business Scenario)
