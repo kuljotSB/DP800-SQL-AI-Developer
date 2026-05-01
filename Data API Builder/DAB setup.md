@@ -132,7 +132,7 @@ GET http://localhost:5000/api/EmissionRecord?$select=CompanyID,CO2_Emissions,Emi
 
 Sort by emissions descending:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$orderby=CO@_Emissions desc
+GET http://localhost:5000/api/EmissionRecord?$orderby=CO2_Emissions desc
 ```
 
 Pagination (first 5 records):
