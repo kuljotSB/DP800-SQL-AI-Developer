@@ -86,17 +86,6 @@ Company -> EmissionRecord (one-to-many)
 }
 ```
 
-Field Mappings for EmissionRecord:
-```json
-"mappings": {
-  "EmissionID": "id",
-  "CompanyID": "companyId",
-  "EmissionDate": "date",
-  "CO2_Emissions": "co2",
-  "Scope": "scope"
-}
-```
-
 #### Run DAB
 
 Set connection string in environment variable
@@ -123,27 +112,27 @@ GET http://localhost:5000/api/EmissionRecord
 
 Filter by CompanyID:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$filter=companyId eq 1
+GET http://localhost:5000/api/EmissionRecord?$filter=CompanyID eq 1
 ```
 
 Filter high emissions:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$filter=co2 gt 500
+GET http://localhost:5000/api/EmissionRecord?$filter=CO2_Emissions gt 500
 ```
 
 Combine filters:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$filter=companyId eq 1 and co2 gt 300
+GET http://localhost:5000/api/EmissionRecord?$filter=CompanyID eq 1 and CO2_Emissions gt 300
 ```
 
 Projection - select specific fields:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$select=companyId,co2,date
+GET http://localhost:5000/api/EmissionRecord?$select=CompanyID,CO2_Emissions,EmissionDate
 ```
 
 Sort by emissions descending:
 ```bash
-GET http://localhost:5000/api/EmissionRecord?$orderby=co2 desc
+GET http://localhost:5000/api/EmissionRecord?$orderby=CO@_Emissions desc
 ```
 
 Pagination (first 5 records):
