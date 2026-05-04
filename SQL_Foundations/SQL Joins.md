@@ -114,16 +114,6 @@ LEFT JOIN ESG.CarbonTargets t
 ON c.CompanyID = t.CompanyID;
 ```
 
-#### Task 3: Find Missing Data using LEFT JOIN
-
-```sql
-SELECT c.CompanyName, t.TargetReductionPercent
-FROM ESG.Companies c
-LEFT JOIN ESG.CarbonTargets t
-ON c.CompanyID = t.CompanyID;
-WHERE c.CompanyID IS NULL;
-```
-
 #### Task 4: RIGHT JOIN
 
 ```sql
