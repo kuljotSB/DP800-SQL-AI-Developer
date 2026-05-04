@@ -166,9 +166,9 @@ SELECT
     SUM(e.CO2_Emissions) AS TotalEmissions,
     SUM(ec.Consumption) AS TotalEnergy
 FROM ESG.Companies c
-LEFT JOIN ESG.EmissionRecords e
+INNER JOIN ESG.EmissionRecords e
     ON c.CompanyID = e.CompanyID
-LEFT JOIN ESG.EnergyConsumption ec
+INNER JOIN ESG.EnergyConsumption ec
     ON c.CompanyID = ec.CompanyID
 GROUP BY c.CompanyName;
 ```
