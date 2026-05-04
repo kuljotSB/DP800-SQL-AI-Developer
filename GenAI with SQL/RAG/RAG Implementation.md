@@ -31,7 +31,7 @@ SET @context = (
         CompanyName AS 'company.name',
         LEFT(ChunkText, 500) AS 'company.summary',
         VECTOR_DISTANCE('cosine', @questionVector, ChunkEmbedding) 
-            AS 'company.relevanceScore'
+            AS 'company.vectorDistance'
     FROM RAG.ESG_Chunks
     ORDER BY VECTOR_DISTANCE('cosine', @questionVector, ChunkEmbedding)
     FOR JSON PATH, ROOT('retrieved_context')
