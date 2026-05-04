@@ -96,7 +96,7 @@ END;
 ```sql
 EXEC RAG.AskESGQuestion 
     @Question = 'What sustainability initiatives has GreenSteel Ltd taken?',
-    @modelName = 'gpt-4.1';
+    @modelName = 'YOUR-MODEL-NAME';
 ```
 
 some other questions to ask:
