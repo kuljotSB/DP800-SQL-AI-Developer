@@ -33,7 +33,7 @@ SET @context = (
         CompanyName AS 'company.name',
         LEFT(ChunkText, 500) AS 'company.summary',
         VECTOR_DISTANCE('cosine', @questionVector, ChunkEmbedding) 
-            AS 'company.relevanceScore'
+            AS 'company.vectorDistance'
     FROM RAG.ESG_Chunks
     ORDER BY VECTOR_DISTANCE('cosine', @questionVector, ChunkEmbedding)
     FOR JSON PATH, ROOT('retrieved_context')
@@ -64,10 +64,10 @@ Add the code block to create the JSON payload for the LLM API:
 Add the code block to call the LLM API with the augmented payload:
 ```sql
     EXEC @returnValue = sp_invoke_external_rest_endpoint
-        @url = N'https://udemydemofoundryre.openai.azure.com/openai/v1/chat/completions',
+        @url = N'https://<resource-name>.openai.azure.com/openai/v1/chat/completions',
         @method = 'POST',
         @payload = @payload,
-        @credential = [https://udemydemofoundryre.openai.azure.com/],
+        @credential = [https://<resource-name>.openai.azure.com/],
         @response = @response OUTPUT;
 ```
 
