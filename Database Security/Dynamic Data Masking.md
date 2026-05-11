@@ -24,7 +24,7 @@ CREATE TABLE ESG.CompanySensitive (
         MASKED WITH (FUNCTION = 'email()'),
 
     Phone NVARCHAR(20) 
-        MASKED WITH (FUNCTION = 'partial(3, "XXX-XXX-", 2)'),
+        MASKED WITH (FUNCTION = 'partial(3, "-XXX-XX-", 2)'),
 
     CreditRating NVARCHAR(10)
         MASKED WITH (FUNCTION = 'default()'),
@@ -70,7 +70,7 @@ Test behavior with SupportUser:
 ```sql
 EXECUTE AS USER = 'SupportUser';
 
-SELECT CompanyName, Email, Phone, Revenue
+SELECT CompanyName, Email, Phone, Revenue, CreditRating
 FROM ESG.CompanySensitive;
 
 REVERT;
@@ -80,7 +80,7 @@ Test behavior with FinanceUser:
 ```sql
 EXECUTE AS USER = 'FinanceUser';  
  
-SELECT CompanyName, Email, Phone, Revenue
+SELECT CompanyName, Email, Phone, Revenue, CreditRating
 FROM ESG.CompanySensitive;
 
 REVERT;
